@@ -4,6 +4,8 @@
   "description": "its a twitter clone.",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon -r dotenv/config app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Prerna Mehra",
@@ -12,5 +14,9 @@
     "apollo-server": "^2.19.0",
     "graphql": "^15.4.0",
     "mongoose": "^5.11.7"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.6"
   }
 }
