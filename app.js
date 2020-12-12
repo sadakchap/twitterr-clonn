@@ -1,16 +1,27 @@
 const { ApolloServer, gql } = require("apollo-server");
 const mongoose = require("mongoose");
 const { MONGO_URI } = require("./config");
+const Post = require("./models/Post");
+
 
 const typeDefs = gql`
+  type Post {
+    id: ID!
+    body: String!
+    createdAt: String!
+    username: String!
+  }
   type Query {
-    sayHi: String!
+    getPosts: [Post!]!
   }
 `;
 
 const resolvers = {
   Query: {
-    sayHi: () => "Hello Chhavi!",
+    getPosts: async() => {
+      const posts = await Post.find();
+      return posts
+    },
   },
 };
 
