@@ -32,6 +32,9 @@ module.exports = {
   Mutation: {
     createPost: async (_, { body }, context) => {
       const user = checkAuth(context);
+      if (body.trim() === "") {
+        throw new UserInputError("Post body can not be Empty!");
+      }
       const post = new Post({
         body,
         username: user.username,
@@ -57,6 +60,31 @@ module.exports = {
         }
         await post.delete();
         return "Post deleted successfully!";
+      } catch (err) {
+        return err;
+      }
+    },
+    updatePost: async (_, { postId, body }, context) => {
+      const user = checkAuth(context);
+      if (body.trim() === "") {
+        throw new UserInputError("Post body can not be Empty!");
+      }
+      try {
+        const post = await Post.findById(postId);
+        if (!post) {
+          throw new UserInputError("Post not found!");
+        }
+
+        if (user.id !== post.author.toString()) {
+          throw new AuthenticationError("Unauthorizied Access Denied!");
+        }
+        post.body = body;
+        const savedPost = await post.save();
+        return {
+          ...savedPost._doc,
+          id: savedPost._id,
+          author: getUser.bind(this, savedPost.author),
+        };
       } catch (err) {
         return err;
       }

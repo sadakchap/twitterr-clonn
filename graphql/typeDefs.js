@@ -36,6 +36,7 @@ const typeDefs = gql`
     register(registerInput: RegisterInput): AuthData!
     createPost(body: String!): Post!
     deletePost(postId: ID!): String!
+    updatePost(postId: ID!, body: String!): Post!
   }
 `;
 
