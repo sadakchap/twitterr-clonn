@@ -13,6 +13,21 @@ module.exports = {
         author: getUser.bind(this, post._doc.author),
       }));
     },
+    getPost: async (_, { postId }) => {
+      try {
+        const post = await Post.findById(postId);
+        if (!post) {
+          throw new UserInputError("Post not Found!");
+        }
+        return {
+          ...post._doc,
+          id: post._id,
+          author: getUser.bind(this, post.author),
+        };
+      } catch (err) {
+        return err;
+      }
+    },
   },
   Mutation: {
     createPost: async (_, { body }, context) => {

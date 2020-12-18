@@ -29,6 +29,7 @@ const typeDefs = gql`
   }
   type Query {
     getPosts: [Post!]!
+    getPost(postId: ID!): Post!
     login(username: String!, password: String!): AuthData!
   }
   type Mutation {
