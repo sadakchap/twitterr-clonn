@@ -1,3 +1,4 @@
+const { UserInputError, AuthenticationError } = require("apollo-server");
 const Post = require("../../models/Post");
 const checkAuth = require("../../utils/checkAuth");
 const { getUser } = require("./mergerFunction");
@@ -27,6 +28,23 @@ module.exports = {
         id: newPost._id,
         author: getUser.bind(this, newPost.author),
       };
+    },
+    deletePost: async (_, { postId }, context) => {
+      const user = checkAuth(context);
+      try {
+        const post = await Post.findById(postId);
+        if (!post) {
+          throw new UserInputError("Post not found!");
+        }
+
+        if (user.id !== post.author.toString()) {
+          throw new AuthenticationError("Unauthorizied Access Denied!");
+        }
+        await post.delete();
+        return "Post deleted successfully!";
+      } catch (err) {
+        return err;
+      }
     },
   },
 };

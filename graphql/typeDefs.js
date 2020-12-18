@@ -34,6 +34,7 @@ const typeDefs = gql`
   type Mutation {
     register(registerInput: RegisterInput): AuthData!
     createPost(body: String!): Post!
+    deletePost(postId: ID!): String!
   }
 `;
 
