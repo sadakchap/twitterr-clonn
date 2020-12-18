@@ -11,12 +11,14 @@ const typeDefs = gql`
   type User {
     id: ID!
     username: String!
+    email: String!
+    bio: String
   }
   type AuthData {
     id: ID!
     username: String!
     token: String!
-    toknExpiration: Int!
+    tokenExpiration: Int!
   }
   input RegisterInput {
     username: String!
@@ -27,6 +29,9 @@ const typeDefs = gql`
   }
   type Query {
     getPosts: [Post!]!
+  }
+  type Mutation {
+    register(registerInput: RegisterInput): AuthData!
   }
 `;
 
