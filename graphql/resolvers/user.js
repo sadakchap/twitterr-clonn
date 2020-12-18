@@ -3,6 +3,10 @@ const bcrypt = require("bcrypt");
 const User = require("../../models/User");
 const jwt = require("jsonwebtoken");
 const { JWT_AUTH } = require("../../config");
+const {
+  validateRegisterInput,
+  validateLoginInput,
+} = require("../../utils/validators");
 
 const generateToken = (payload) => {
   return jwt.sign(payload, JWT_AUTH, {
@@ -11,17 +15,59 @@ const generateToken = (payload) => {
 };
 
 module.exports = {
+  Query: {
+    login: async (_, args) => {
+      const { username, password } = args;
+      const { valid, errors } = validateLoginInput(username, password);
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+      try {
+        const user = await User.findOne({ username });
+        if (!user) {
+          throw new UserInputError("User doesn't exists", {
+            errors: {
+              username: "User not Found!",
+            },
+          });
+        }
+
+        const matched = await bcrypt.compare(password, user.password);
+        if (!matched) {
+          throw new UserInputError("Username & password do not match", {
+            errors: {
+              username: "Username & password do not match!",
+            },
+          });
+        }
+        const token = generateToken({ id: user._id, username: user.username });
+        return {
+          id: user._id,
+          username: user.username,
+          token,
+          tokenExpiration: 1,
+        };
+      } catch (err) {
+        return err;
+      }
+    },
+  },
   Mutation: {
     register: async (_, args) => {
       const {
         registerInput: { username, email, password, confirmPassword, bio },
       } = args;
-      // valid user Input
-      // check for existing user, if exists -> throw err
 
-      // hash the password
-      // save the user in db
-      // generate a token
+      const { valid, errors } = validateRegisterInput(
+        username,
+        email,
+        password,
+        confirmPassword
+      );
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+
       try {
         const user = await User.findOne({ username });
         if (user) {
@@ -55,6 +101,3 @@ module.exports = {
     },
   },
 };
-// bcrypt.compare(myPlaintextPassword, hash, function (err, result) {
-//   // result == true
-// });
