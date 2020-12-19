@@ -1,5 +1,6 @@
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const Post = require("../../models/Post");
+const User = require("../../models/User");
 const checkAuth = require("../../utils/checkAuth");
 const { getUser } = require("./mergerFunction");
 
@@ -41,6 +42,9 @@ module.exports = {
         author: user.id,
       });
       const newPost = await post.save();
+      const author = await User.findById(user.id);
+      author.posts.push(newPost);
+      author.save();
       return {
         ...newPost._doc,
         id: newPost._id,

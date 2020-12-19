@@ -6,6 +6,13 @@ const userSchema = new Schema(
     email: String,
     password: String,
     bio: String,
+    posts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+    profile_pic: String,
   },
   { timestamps: true }
 );
