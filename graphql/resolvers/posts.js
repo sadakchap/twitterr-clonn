@@ -89,5 +89,39 @@ module.exports = {
         return err;
       }
     },
+    likePost: async (_, { postId }, context) => {
+      const user = checkAuth(context);
+      try {
+        const post = await Post.findById(postId);
+        if (!post) {
+          throw new UserInputError("Post not Found!");
+        }
+        // check if user exists in likes array
+        // if exists then remove
+        // else add
+        const isLiked = post.likes.findIndex(
+          (like) => like.username === user.username
+        );
+        if (isLiked < 0) {
+          // not found
+          post.likes.push({
+            username: user.username,
+            createdAt: new Date().toISOString(),
+          });
+        } else {
+          post.likes = post.likes.filter(
+            (like) => like.username !== user.username
+          );
+        }
+        const saved = await post.save();
+        return {
+          ...saved._doc,
+          id: saved._id,
+          author: getUser.bind(this, saved.author),
+        };
+      } catch (err) {
+        return err;
+      }
+    },
   },
 };
