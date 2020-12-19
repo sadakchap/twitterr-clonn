@@ -7,6 +7,13 @@ const typeDefs = gql`
     createdAt: String!
     username: String!
     author: User
+    comments: [Comment!]!
+  }
+  type Comment {
+    id: ID!
+    username: String!
+    body: String!
+    createdAt: String!
   }
   type User {
     id: ID!
@@ -37,6 +44,8 @@ const typeDefs = gql`
     createPost(body: String!): Post!
     deletePost(postId: ID!): String!
     updatePost(postId: ID!, body: String!): Post!
+    createComment(postId: ID!, body: String!): Post!
+    deleteComment(postId: ID!, commentId: ID!): Post!
   }
 `;
 
