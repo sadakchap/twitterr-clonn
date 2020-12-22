@@ -15,7 +15,7 @@ const generateToken = (payload) => {
 };
 
 module.exports = {
-  Query: {
+  Mutation: {
     login: async (_, args) => {
       const { username, password } = args;
       const { valid, errors } = validateLoginInput(username, password);
@@ -51,8 +51,6 @@ module.exports = {
         return err;
       }
     },
-  },
-  Mutation: {
     register: async (_, args) => {
       const {
         registerInput: { username, email, password, confirmPassword, bio },
