@@ -7,6 +7,7 @@ const {
   validateRegisterInput,
   validateLoginInput,
 } = require("../../utils/validators");
+const { getPosts } = require("./mergerFunction");
 
 const generateToken = (payload) => {
   return jwt.sign(payload, JWT_AUTH, {
@@ -15,6 +16,22 @@ const generateToken = (payload) => {
 };
 
 module.exports = {
+  Query: {
+    getUsers: async (_, { filter }) => {
+      try {
+        const users = await User.find({
+          username: new RegExp(filter, "i"),
+        });
+        return users.map((user) => ({
+          ...user._doc,
+          id: user._id,
+          posts: getPosts.bind(this, user.posts),
+        }));
+      } catch (err) {
+        return err;
+      }
+    },
+  },
   Mutation: {
     login: async (_, args) => {
       const { username, password } = args;

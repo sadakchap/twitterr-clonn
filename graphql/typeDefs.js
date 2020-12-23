@@ -45,6 +45,7 @@ const typeDefs = gql`
   type Query {
     getPosts: [Post!]!
     getPost(postId: ID!): Post!
+    getUsers(filter: String): [User!]!
   }
   type Mutation {
     login(username: String!, password: String!): AuthData!
