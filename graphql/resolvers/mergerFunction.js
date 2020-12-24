@@ -4,7 +4,6 @@ const User = require("../../models/User");
 const getUser = async (userId) => {
   try {
     const user = await User.findById(userId);
-    console.log(user);
     return {
       ...user._doc,
       id: user._id,
@@ -16,7 +15,6 @@ const getUser = async (userId) => {
 };
 
 const getPosts = async (postIds) => {
-  console.log("why I can't get postIds", postIds);
   try {
     const posts = await Post.find({ _id: { $in: postIds } });
     return posts.map((post) => ({
