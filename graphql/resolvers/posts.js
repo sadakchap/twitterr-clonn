@@ -7,7 +7,7 @@ const { getUser } = require("./mergerFunction");
 module.exports = {
   Query: {
     getPosts: async () => {
-      const posts = await Post.find();
+      const posts = await Post.find().sort({ createdAt: -1 });
       return posts.map((post) => ({
         ...post._doc,
         id: post._id,
