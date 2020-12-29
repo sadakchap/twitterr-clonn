@@ -1,12 +1,7 @@
-exports.validateRegisterInput = (
-  username,
-  email,
-  password,
-  confirmPassword
-) => {
+exports.validateRegisterInput = (name, email, password) => {
   const errors = {};
-  if (username.trim() === "") {
-    errors.username = "Username is required!";
+  if (name.trim() === "") {
+    errors.name = "Name is required!";
   }
   if (email.trim() === "") {
     errors.email = "Email is required!";
@@ -19,8 +14,6 @@ exports.validateRegisterInput = (
 
   if (password === "") {
     errors.password = "Password is required!";
-  } else if (password !== confirmPassword) {
-    errors.confirmPassword = "Passwords must match!";
   }
 
   return {

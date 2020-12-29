@@ -1,19 +1,12 @@
 const { UserInputError } = require("apollo-server");
 const bcrypt = require("bcrypt");
 const User = require("../../models/User");
-const jwt = require("jsonwebtoken");
-const { JWT_AUTH } = require("../../config");
 const {
   validateRegisterInput,
   validateLoginInput,
 } = require("../../utils/validators");
 const { getPosts } = require("./mergerFunction");
-
-const generateToken = (payload) => {
-  return jwt.sign(payload, JWT_AUTH, {
-    expiresIn: "1h",
-  });
-};
+const { generateToken, getUniqueUsername } = require("../../utils/authUtils");
 
 module.exports = {
   Query: {
@@ -70,39 +63,39 @@ module.exports = {
     },
     register: async (_, args) => {
       const {
-        registerInput: { username, email, password, confirmPassword, bio },
+        registerInput: { name, email, password, bio },
       } = args;
 
-      const { valid, errors } = validateRegisterInput(
-        username,
-        email,
-        password,
-        confirmPassword
-      );
+      const { valid, errors } = validateRegisterInput(name, email, password);
       if (!valid) {
         throw new UserInputError("Errors", { errors });
       }
 
       try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ email });
         if (user) {
-          throw new UserInputError("Username is taken!", {
+          throw new UserInputError("Email is taken!", {
             errors: {
-              username: "Username is taken!",
+              username: "Email is taken!",
             },
           });
         }
+        // generate a unique username & hash password
+        const username = getUniqueUsername(name);
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
+          name,
           username,
           email,
           password: hashedPassword,
           bio,
         });
+
         const savedUser = await newUser.save();
         const token = generateToken({
           id: savedUser._id,
           username: savedUser.username,
+          name: savedUser.name, // see if we need this in frontend?
         });
         return {
           ...savedUser._doc,

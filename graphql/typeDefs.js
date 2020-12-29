@@ -38,10 +38,9 @@ const typeDefs = gql`
     tokenExpiration: Int!
   }
   input RegisterInput {
-    username: String!
+    name: String!
     email: String!
     password: String!
-    confirmPassword: String!
     bio: String
   }
   type Query {
