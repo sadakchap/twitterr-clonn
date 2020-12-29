@@ -33,7 +33,9 @@ module.exports = {
         throw new UserInputError("Errors", { errors });
       }
       try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({
+          $or: [{ username: username }, { email: username }],
+        });
         if (!user) {
           throw new UserInputError("User doesn't exists", {
             errors: {
@@ -50,7 +52,11 @@ module.exports = {
             },
           });
         }
-        const token = generateToken({ id: user._id, username: user.username });
+        const token = generateToken({
+          id: user._id,
+          username: user.username,
+          name: user.name,
+        });
         return {
           id: user._id,
           username: user.username,
