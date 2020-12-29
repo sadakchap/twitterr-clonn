@@ -31,6 +31,7 @@ const typeDefs = gql`
     bio: String
     posts: [Post!]!
     profile_pic: String
+    postsCount: Int!
   }
   type AuthData {
     id: ID!
@@ -50,6 +51,7 @@ const typeDefs = gql`
     getPosts: [Post!]!
     getPost(postId: ID!): Post!
     getUsers(filter: String): [User!]!
+    getUser(username: String!): User!
   }
   type Mutation {
     login(username: String!, password: String!): AuthData!

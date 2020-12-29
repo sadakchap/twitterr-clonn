@@ -24,6 +24,23 @@ module.exports = {
         return err;
       }
     },
+    getUser: async (_, { username }) => {
+      try {
+        const user = await User.findOne({ username });
+        if (!user) {
+          throw new UserInputError("User doesn't exists");
+        }
+        return {
+          ...user._doc,
+          id: user._id,
+          posts: getPosts.bind(this, user.posts),
+          postsCount: user.posts.length,
+        };
+      } catch (err) {
+        console.log(err);
+        return err;
+      }
+    },
   },
   Mutation: {
     login: async (_, args) => {
