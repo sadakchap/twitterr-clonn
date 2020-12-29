@@ -61,6 +61,7 @@ module.exports = {
         return {
           id: user._id,
           username: user.username,
+          name: user.name,
           profile_pic: user.profile_pic,
           token,
           tokenExpiration: 1,
