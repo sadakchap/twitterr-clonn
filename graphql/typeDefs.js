@@ -35,7 +35,7 @@ const typeDefs = gql`
   type AuthData {
     id: ID!
     username: String!
-    profile_pic: String!
+    profile_pic: String
     token: String!
     tokenExpiration: Int!
   }
