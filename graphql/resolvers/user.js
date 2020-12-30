@@ -138,6 +138,7 @@ module.exports = {
       const {
         userInput: { name, bio, profile_pic, website, location },
       } = args;
+
       const authUser = checkAuth(context);
       try {
         const user = await User.findById(authUser.id);
@@ -149,7 +150,9 @@ module.exports = {
         user.profile_pic = profile_pic;
         user.website = website;
         user.location = location;
+
         const updatedUser = await user.save();
+
         return {
           ...updatedUser._doc,
           id: updatedUser._id,

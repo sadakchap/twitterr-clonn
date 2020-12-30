@@ -54,7 +54,7 @@ const typeDefs = gql`
   }
   input UserInput {
     name: String!
-    profile_pic: String!
+    profile_pic: String
     bio: String
     location: String
     website: String

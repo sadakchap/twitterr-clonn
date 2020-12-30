@@ -24,6 +24,9 @@ const userSchema = new Schema(
     ],
     profile_pic: String,
     background_pic: String,
+    website: String,
+    location: String,
+    dob: Date,
   },
   { timestamps: true }
 );
