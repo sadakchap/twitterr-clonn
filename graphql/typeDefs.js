@@ -52,6 +52,13 @@ const typeDefs = gql`
     password: String!
     bio: String
   }
+  input UserInput {
+    name: String!
+    profile_pic: String!
+    bio: String
+    location: String
+    website: String
+  }
   type Query {
     getPosts: [Post!]!
     getPost(postId: ID!): Post!
@@ -67,6 +74,7 @@ const typeDefs = gql`
     createComment(postId: ID!, body: String!): Post!
     deleteComment(postId: ID!, commentId: ID!): Post!
     likePost(postId: ID!): Post! # this is toggle
+    updateUser(userInput: UserInput!): User!
   }
 `;
 

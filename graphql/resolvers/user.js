@@ -7,6 +7,7 @@ const {
 } = require("../../utils/validators");
 const { getPosts } = require("./mergerFunction");
 const { generateToken, getUniqueUsername } = require("../../utils/authUtils");
+const checkAuth = require("../../utils/checkAuth");
 
 module.exports = {
   Query: {
@@ -128,6 +129,32 @@ module.exports = {
           id: savedUser._id,
           token,
           tokenExpiration: 1,
+        };
+      } catch (err) {
+        return err;
+      }
+    },
+    updateUser: async (_, args, context) => {
+      const {
+        userInput: { name, bio, profile_pic, website, location },
+      } = args;
+      const authUser = checkAuth(context);
+      try {
+        const user = await User.findById(authUser.id);
+        if (!user) {
+          throw new UserInputError("User not found!");
+        }
+        user.name = name;
+        user.bio = bio;
+        user.profile_pic = profile_pic;
+        user.website = website;
+        user.location = location;
+        const updatedUser = await user.save();
+        return {
+          ...updatedUser._doc,
+          id: updatedUser._id,
+          posts: getPosts.bind(this, updatedUser.posts),
+          postsCount: updatedUser.posts.length,
         };
       } catch (err) {
         return err;
