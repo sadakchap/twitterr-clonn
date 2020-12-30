@@ -28,10 +28,15 @@ const typeDefs = gql`
     username: String!
     name: String!
     email: String!
-    bio: String
     posts: [Post!]!
-    profile_pic: String
+    createdAt: String!
     postsCount: Int!
+    bio: String
+    profile_pic: String
+    background_pic: String
+    website: String
+    location: String
+    dob: String
   }
   type AuthData {
     id: ID!
