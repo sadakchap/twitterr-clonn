@@ -17,6 +17,7 @@ module.exports = {
           throw new UserInputError("Post not Found!");
         }
         const comment = {
+          name: user.name,
           username: user.username,
           body,
           createdAt: new Date().toISOString(),
