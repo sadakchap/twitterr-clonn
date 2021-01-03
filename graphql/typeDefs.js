@@ -1,6 +1,13 @@
 const { gql } = require("apollo-server");
 
 const typeDefs = gql`
+  type Message {
+    id: ID!
+    content: String!
+    to: String!
+    from: String!
+    createdAt: String!
+  }
   type Post {
     id: ID!
     body: String!
@@ -65,6 +72,7 @@ const typeDefs = gql`
     getPost(postId: ID!): Post!
     getUsers(filter: String): [User!]!
     getUser(username: String!): User!
+    getMessages(from: String!): [Message!]!
   }
   type Mutation {
     login(username: String!, password: String!): AuthData!
@@ -76,6 +84,8 @@ const typeDefs = gql`
     deleteComment(postId: ID!, commentId: ID!): Post!
     likePost(postId: ID!): Post! # this is toggle
     updateUser(userInput: UserInput!): User!
+
+    sendMessage(to: String!, content: String!): Message!
   }
 `;
 
