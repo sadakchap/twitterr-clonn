@@ -72,6 +72,7 @@ const typeDefs = gql`
     getPost(postId: ID!): Post!
     getUsers(filter: String): [User!]!
     getUser(username: String!): User!
+
     getMessages(from: String!): [Message!]!
   }
   type Mutation {

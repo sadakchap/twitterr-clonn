@@ -4,6 +4,39 @@ const User = require("../../models/User");
 const checkAuth = require("../../utils/checkAuth");
 
 module.exports = {
+  Query: {
+    getMessages: async (_, { from }, context) => {
+      const user = checkAuth(context);
+      try {
+        const otherUser = await User.findOne({ username: from });
+
+        if (!otherUser) {
+          throw new UserInputError("User not found");
+        }
+
+        const userNameList = [user.username, otherUser.username];
+        const messages = await Message.find({
+          $and: [
+            {
+              to: {
+                $in: userNameList,
+              },
+            },
+            {
+              from: {
+                $in: userNameList,
+              },
+            },
+          ],
+        }).sort({ createdAt: -1 });
+
+        return messages;
+      } catch (err) {
+        console.log(err);
+        return err;
+      }
+    },
+  },
   Mutation: {
     sendMessage: async (_, args, context) => {
       const user = checkAuth(context);
