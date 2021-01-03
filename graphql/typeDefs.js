@@ -45,6 +45,7 @@ const typeDefs = gql`
     website: String
     location: String
     dob: String
+    lastMessage: Message
   }
   type AuthData {
     id: ID!

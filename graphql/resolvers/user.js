@@ -8,19 +8,43 @@ const {
 const { getPosts } = require("./mergerFunction");
 const { generateToken, getUniqueUsername } = require("../../utils/authUtils");
 const checkAuth = require("../../utils/checkAuth");
+const Message = require("../../models/Message");
 
 module.exports = {
   Query: {
-    getUsers: async (_, { filter }) => {
+    getUsers: async (_, { filter }, context) => {
+      const user = checkAuth(context);
+
       try {
-        const users = await User.find({
-          username: new RegExp(filter, "i"),
+        let users = await User.find({
+          $and: [
+            { username: new RegExp(filter, "i") },
+            { _id: { $ne: user.id } },
+          ],
         });
-        return users.map((user) => ({
-          ...user._doc,
-          id: user._id,
-          posts: getPosts.bind(this, user.posts),
-        }));
+
+        // TODO: make this db call only if lastMessage field is requested
+        const allUserMessages = await Message.find({
+          $or: [{ to: user.username }, { from: user.username }],
+        }).sort({ createdAt: -1 });
+
+        return users.map((otherUser) => {
+          const lastMessage = allUserMessages.find(
+            (m) => m.to === otherUser.username || m.from === otherUser.username
+          );
+          return {
+            ...otherUser._doc,
+            id: otherUser._id,
+            posts: getPosts.bind(this, otherUser.posts),
+            lastMessage,
+          };
+        });
+
+        // return users.map((user) => ({
+        //   ...user._doc,
+        //   id: user._id,
+        //   posts: getPosts.bind(this, user.posts),
+        // }));
       } catch (err) {
         return err;
       }
