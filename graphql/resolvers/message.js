@@ -70,7 +70,7 @@ module.exports = {
       }
     },
     reactToMessage: async (_, { messageId, content }, context) => {
-      const { user } = checkAuth(context);
+      const { user, pubsub } = checkAuth(context);
       const reactions = ["❤️", "😍", "😢", "👍", "👎", "😲", "😡", "😂"];
       try {
         if (!reactions.includes(content))
@@ -101,11 +101,14 @@ module.exports = {
           });
           await reaction.save();
         }
-        return {
-          ...reaction._doc,
-          id: reaction._id,
-          user: getUser.bind(this, reaction.userId),
-        };
+
+        pubsub.publish("NEW_REACTION", { newReaction: reaction });
+        return reaction;
+        // return {
+        //   ...reaction._doc,
+        //   id: reaction._id,
+        //   user: getUser.bind(this, reaction.userId),
+        // };
       } catch (err) {
         return err;
       }
@@ -123,6 +126,19 @@ module.exports = {
           return (
             newMessage.from === user.username || newMessage.to === user.username
           );
+        }
+      ),
+    },
+    newReaction: {
+      subscribe: withFilter(
+        (_, __, context) => {
+          const { pubsub } = checkAuth(context);
+          return pubsub.asyncIterator(["NEW_REACTION"]);
+        },
+        async ({ newReaction }, _, context) => {
+          const { user } = checkAuth(context);
+          const message = await Message.findById(newReaction.messageId);
+          return message.from === user.username || message.to === user.username;
         }
       ),
     },

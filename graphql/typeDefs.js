@@ -99,6 +99,7 @@ const typeDefs = gql`
   }
   type Subscription {
     newMessage: Message!
+    newReaction: Reaction!
   }
 `;
 

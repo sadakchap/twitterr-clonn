@@ -3,6 +3,7 @@ const userResolvers = require("./user");
 const commentResolvers = require("./comment");
 const messageResolvers = require("./message");
 const Message = require("../../models/Message");
+const User = require("../../models/User");
 
 module.exports = {
   Message: {
@@ -15,6 +16,7 @@ module.exports = {
   Reaction: {
     message: async (parent) => await Message.findById(parent.messageId),
     createdAt: (parent) => parent.createdAt.toISOString(),
+    user: async (parent) => await User.findById(parent.userId),
   },
   Query: {
     ...postResolvers.Query,
