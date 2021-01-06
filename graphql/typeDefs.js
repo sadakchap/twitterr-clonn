@@ -1,6 +1,13 @@
 const { gql } = require("apollo-server");
 
 const typeDefs = gql`
+  type Reaction {
+    id: ID!
+    content: String!
+    message: Message!
+    user: User!
+    createdAt: String!
+  }
   type Message {
     id: ID!
     content: String!
@@ -88,6 +95,7 @@ const typeDefs = gql`
     updateUser(userInput: UserInput!): User!
 
     sendMessage(to: String!, content: String!): Message!
+    reactToMessage(messageId: ID!, content: String!): Reaction!
   }
   type Subscription {
     newMessage: Message!
