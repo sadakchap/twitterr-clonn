@@ -8,6 +8,7 @@ const getUser = async (userId) => {
       ...user._doc,
       id: user._id,
       posts: getPosts.bind(this, user.posts),
+      postsCount: user.posts.length,
     };
   } catch (err) {
     return err;
