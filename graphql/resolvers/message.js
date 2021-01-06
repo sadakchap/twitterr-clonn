@@ -1,7 +1,9 @@
-const { UserInputError, withFilter } = require("apollo-server");
+const { UserInputError, withFilter, ForbiddenError } = require("apollo-server");
 const Message = require("../../models/Message");
+const Reaction = require("../../models/Reaction");
 const User = require("../../models/User");
 const checkAuth = require("../../utils/checkAuth");
+const { getUser } = require("./mergerFunction");
 
 module.exports = {
   Query: {
@@ -63,6 +65,47 @@ module.exports = {
         pubsub.publish("NEW_MESSAGE", { newMessage: message });
 
         return message;
+      } catch (err) {
+        return err;
+      }
+    },
+    reactToMessage: async (_, { messageId, content }, context) => {
+      const { user } = checkAuth(context);
+      const reactions = ["❤️", "😍", "😢", "👍", "👎", "😲", "😡", "😂"];
+      try {
+        if (!reactions.includes(content))
+          throw new UserInputError("Invalid reaction");
+        // check message
+        const message = await Message.findById(messageId);
+        if (!message) {
+          throw new UserInputError("Message not found!");
+        }
+
+        if (user.username !== message.to && user.username !== message.from) {
+          throw new ForbiddenError("UnAuthorizied!");
+        }
+
+        let reaction = await Reaction.findOne({
+          messageId: message.id,
+          userId: user.id,
+        });
+        if (reaction) {
+          // update reaction
+          reaction.content = content;
+          await reaction.save();
+        } else {
+          reaction = new Reaction({
+            content,
+            messageId: message.id,
+            userId: user.id,
+          });
+          await reaction.save();
+        }
+        return {
+          ...reaction._doc,
+          id: reaction._id,
+          user: getUser.bind(this, reaction.userId),
+        };
       } catch (err) {
         return err;
       }
