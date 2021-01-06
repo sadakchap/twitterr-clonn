@@ -1,14 +1,12 @@
-const { UserInputError, PubSub } = require("apollo-server");
+const { UserInputError, withFilter } = require("apollo-server");
 const Message = require("../../models/Message");
 const User = require("../../models/User");
 const checkAuth = require("../../utils/checkAuth");
 
-const pubsub = new PubSub();
-
 module.exports = {
   Query: {
     getMessages: async (_, { from }, context) => {
-      const user = checkAuth(context);
+      const { user } = checkAuth(context);
       try {
         const otherUser = await User.findOne({ username: from });
 
@@ -41,7 +39,7 @@ module.exports = {
   },
   Mutation: {
     sendMessage: async (_, args, context) => {
-      const user = checkAuth(context);
+      const { user, pubsub } = checkAuth(context);
       const { content, to } = args;
       if (content.trim() === "") {
         throw new UserInputError("Message can't be empty");
@@ -56,7 +54,7 @@ module.exports = {
         if (recipient.username === user.username) {
           throw new UserInputError("God, you are a legend!");
         }
-        const message = new Message({
+        const message = await new Message({
           content,
           to,
           from: user.username,
@@ -72,7 +70,18 @@ module.exports = {
   },
   Subscription: {
     newMessage: {
-      subscribe: () => pubsub.asyncIterator(["NEW_MESSAGE"]),
+      subscribe: withFilter(
+        (_, __, context) => {
+          const { pubsub } = checkAuth(context);
+          return pubsub.asyncIterator(["NEW_MESSAGE"]);
+        },
+        ({ newMessage }, _, context) => {
+          const { user } = checkAuth(context);
+          return (
+            newMessage.from === user.username || newMessage.to === user.username
+          );
+        }
+      ),
     },
   },
 };

@@ -32,7 +32,7 @@ module.exports = {
   },
   Mutation: {
     createPost: async (_, { body }, context) => {
-      const user = checkAuth(context);
+      const { user } = checkAuth(context);
       if (body.trim() === "") {
         throw new UserInputError("Post body can not be Empty!");
       }
@@ -52,7 +52,7 @@ module.exports = {
       };
     },
     deletePost: async (_, { postId }, context) => {
-      const user = checkAuth(context);
+      const { user } = checkAuth(context);
       try {
         const post = await Post.findById(postId);
         if (!post) {
@@ -69,7 +69,7 @@ module.exports = {
       }
     },
     updatePost: async (_, { postId, body }, context) => {
-      const user = checkAuth(context);
+      const { user } = checkAuth(context);
       if (body.trim() === "") {
         throw new UserInputError("Post body can not be Empty!");
       }
@@ -94,7 +94,7 @@ module.exports = {
       }
     },
     likePost: async (_, { postId }, context) => {
-      const user = checkAuth(context);
+      const { user } = checkAuth(context);
       try {
         const post = await Post.findById(postId);
         if (!post) {

@@ -13,7 +13,7 @@ const Message = require("../../models/Message");
 module.exports = {
   Query: {
     getUsers: async (_, { filter }, context) => {
-      const user = checkAuth(context);
+      const { user } = checkAuth(context);
 
       try {
         let users = await User.find({
@@ -163,7 +163,7 @@ module.exports = {
         userInput: { name, bio, profile_pic, website, location },
       } = args;
 
-      const authUser = checkAuth(context);
+      const { user: authUser } = checkAuth(context);
       try {
         const user = await User.findById(authUser.id);
         if (!user) {
