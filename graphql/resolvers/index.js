@@ -2,6 +2,7 @@ const postResolvers = require("./posts");
 const userResolvers = require("./user");
 const commentResolvers = require("./comment");
 const messageResolvers = require("./message");
+const Message = require("../../models/Message");
 
 module.exports = {
   Message: {
@@ -10,6 +11,10 @@ module.exports = {
   Post: {
     likesCount: async (parent) => parent.likes.length,
     commentsCount: async (parent) => parent.comments.length,
+  },
+  Reaction: {
+    message: async (parent) => await Message.findById(parent.messageId),
+    createdAt: (parent) => parent.createdAt.toISOString(),
   },
   Query: {
     ...postResolvers.Query,
