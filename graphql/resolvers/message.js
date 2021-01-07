@@ -30,7 +30,9 @@ module.exports = {
               },
             },
           ],
-        }).sort({ createdAt: -1 });
+        })
+          .populate("reactions", "_id content")
+          .sort({ createdAt: -1 });
 
         return messages;
       } catch (err) {
@@ -99,7 +101,9 @@ module.exports = {
             messageId: message.id,
             userId: user.id,
           });
-          await reaction.save();
+          const newReaction = await reaction.save();
+          message.reactions.push(newReaction);
+          await message.save();
         }
 
         pubsub.publish("NEW_REACTION", { newReaction: reaction });
