@@ -3,7 +3,6 @@ const Message = require("../../models/Message");
 const Reaction = require("../../models/Reaction");
 const User = require("../../models/User");
 const checkAuth = require("../../utils/checkAuth");
-const { getUser } = require("./mergerFunction");
 
 module.exports = {
   Query: {
