@@ -1,5 +1,6 @@
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const Post = require("../../models/Post");
+const User = require("../../models/User");
 const checkAuth = require("../../utils/checkAuth");
 const { getUser } = require("./mergerFunction");
 
@@ -24,6 +25,25 @@ module.exports = {
         };
         post.comments.unshift(comment);
         const savedPost = await post.save();
+
+        // push notification in post author user model
+        if (post.username !== user.username) {
+          const postAuthor = await User.findById(post.author);
+          if (!postAuthor) {
+            throw new UserInputError("WTH, how did it happened!");
+          }
+          postAuthor.notifications.unshift({
+            link: `/tweet/${post.id}`,
+            verb: "commented", // liked, commented, tagged
+            message: `${user.name} commented on your tweet!`,
+            username: user.username,
+            name: user.name,
+            createdAt: new Date().toISOString(),
+          });
+
+          postAuthor.save();
+        }
+
         return {
           ...savedPost._doc,
           id: savedPost._id,
