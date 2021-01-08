@@ -39,6 +39,16 @@ const typeDefs = gql`
     createdAt: String!
     name: String
   }
+  type Notification {
+    id: ID!
+    read: Boolean!
+    verb: String!
+    link: String!
+    username: String!
+    name: String!
+    createdAt: String!
+    message: String
+  }
   type User {
     id: ID!
     username: String!
@@ -47,6 +57,8 @@ const typeDefs = gql`
     posts: [Post!]!
     createdAt: String!
     postsCount: Int!
+    unreadNotifications: Int!
+    notifications: [Notification!]
     bio: String
     profile_pic: String
     background_pic: String
@@ -62,6 +74,7 @@ const typeDefs = gql`
     profile_pic: String
     token: String!
     tokenExpiration: Int!
+    unreadNotifications: Int!
   }
   input RegisterInput {
     name: String!
@@ -83,6 +96,7 @@ const typeDefs = gql`
     getUser(username: String!): User!
 
     getMessages(from: String!): [Message!]!
+    getNotifications: [Notification!]!
   }
   type Mutation {
     login(username: String!, password: String!): AuthData!
@@ -97,6 +111,7 @@ const typeDefs = gql`
 
     sendMessage(to: String!, content: String!): Message!
     reactToMessage(messageId: ID!, content: String!): Reaction!
+    markNotificationsRead(notificationsIds: [ID!]!): String!
   }
   type Subscription {
     newMessage: Message!

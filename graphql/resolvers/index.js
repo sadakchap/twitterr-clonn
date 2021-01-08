@@ -2,6 +2,8 @@ const postResolvers = require("./posts");
 const userResolvers = require("./user");
 const commentResolvers = require("./comment");
 const messageResolvers = require("./message");
+const notificationResolvers = require("./notification");
+
 const Message = require("../../models/Message");
 const User = require("../../models/User");
 
@@ -22,12 +24,14 @@ module.exports = {
     ...postResolvers.Query,
     ...userResolvers.Query,
     ...messageResolvers.Query,
+    ...notificationResolvers.Query,
   },
   Mutation: {
     ...userResolvers.Mutation,
     ...postResolvers.Mutation,
     ...commentResolvers.Mutation,
     ...messageResolvers.Mutation,
+    ...notificationResolvers.Mutation,
   },
   Subscription: {
     ...messageResolvers.Subscription,
