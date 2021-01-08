@@ -32,11 +32,15 @@ module.exports = {
           const lastMessage = allUserMessages.find(
             (m) => m.to === otherUser.username || m.from === otherUser.username
           );
+          const unreadNotifications = otherUser.notifications
+            ? otherUser.notifications.filter((not) => not.read === false).length
+            : 0;
           return {
             ...otherUser._doc,
             id: otherUser._id,
             posts: getPosts.bind(this, otherUser.posts),
             lastMessage,
+            unreadNotifications,
           };
         });
 
@@ -55,11 +59,15 @@ module.exports = {
         if (!user) {
           throw new UserInputError("User doesn't exists");
         }
+        const unreadNotifications = user.notifications
+          ? user.notifications.filter((not) => not.read === false).length
+          : 0;
         return {
           ...user._doc,
           id: user._id,
           posts: getPosts.bind(this, user.posts),
           postsCount: user.posts.length,
+          unreadNotifications,
         };
       } catch (err) {
         console.log(err);
@@ -100,6 +108,11 @@ module.exports = {
           name: user.name,
           profile_pic: user.profile_pic,
         });
+
+        const unreadNotifications = user.notifications
+          ? user.notifications.filter((not) => not.read === false).length
+          : 0;
+
         return {
           id: user._id,
           username: user.username,
@@ -107,6 +120,7 @@ module.exports = {
           profile_pic: user.profile_pic,
           token,
           tokenExpiration: 1,
+          unreadNotifications,
         };
       } catch (err) {
         return err;
@@ -153,6 +167,7 @@ module.exports = {
           id: savedUser._id,
           token,
           tokenExpiration: 1,
+          unreadNotifications: 0,
         };
       } catch (err) {
         return err;
