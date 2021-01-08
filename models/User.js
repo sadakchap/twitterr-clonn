@@ -22,6 +22,20 @@ const userSchema = new Schema(
         ref: "Post",
       },
     ],
+    notifications: [
+      {
+        link: String,
+        read: {
+          type: Boolean,
+          default: false,
+        },
+        verb: String, // liked, commented, tagged
+        message: String,
+        username: String,
+        name: String,
+        createdAt: String,
+      },
+    ],
     profile_pic: String,
     background_pic: String,
     website: String,
