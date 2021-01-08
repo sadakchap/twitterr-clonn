@@ -48,6 +48,27 @@ module.exports = {
 
       if (mentionedUsers.length) {
         // bulk write to users notifications
+        const newNotification = {
+          link: `/tweet/${post.id}`,
+          verb: "tagged", // liked, commented, tagged
+          message: `${user.name} mentioned you in their tweet!`,
+          username: user.username,
+          name: user.name,
+          createdAt: new Date().toISOString(),
+        };
+        const bulkOperations = [];
+        mentionedUsers.forEach((mentionedUser) => {
+          if (mentionedUser !== user.username) {
+            bulkOperations.push({
+              updateOne: {
+                filter: { username: mentionedUser },
+                update: { $push: { notifications: newNotification } },
+                upsert: true,
+              },
+            });
+          }
+        });
+        User.bulkWrite(bulkOperations);
       }
 
       return {
@@ -117,6 +138,23 @@ module.exports = {
             username: user.username,
             createdAt: new Date().toISOString(),
           });
+
+          // push notification in post author user model
+          if (post.username !== user.username) {
+            const postAuthor = await User.findById(post.author);
+            if (!postAuthor) {
+              throw new UserInputError("WTH, how did it happened!");
+            }
+            postAuthor.notifications.unshift({
+              link: `/tweet/${post.id}`,
+              verb: "liked", // liked, commented, tagged
+              message: `${user.name} liked your tweet!`,
+              username: user.username,
+              name: user.name,
+              createdAt: new Date().toISOString(),
+            });
+            postAuthor.save();
+          }
         } else {
           post.likes = post.likes.filter(
             (like) => like.username !== user.username
