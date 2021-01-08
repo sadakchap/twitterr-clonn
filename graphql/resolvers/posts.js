@@ -31,7 +31,7 @@ module.exports = {
     },
   },
   Mutation: {
-    createPost: async (_, { body }, context) => {
+    createPost: async (_, { body, mentionedUsers }, context) => {
       const { user } = checkAuth(context);
       if (body.trim() === "") {
         throw new UserInputError("Post body can not be Empty!");
@@ -44,7 +44,12 @@ module.exports = {
       const newPost = await post.save();
       const author = await User.findById(user.id);
       author.posts.push(newPost);
-      author.save();
+      await author.save();
+
+      if (mentionedUsers.length) {
+        // bulk write to users notifications
+      }
+
       return {
         ...newPost._doc,
         id: newPost._id,
