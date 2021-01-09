@@ -41,41 +41,46 @@ module.exports = {
         username: user.username,
         author: user.id,
       });
-      const newPost = await post.save();
-      const author = await User.findById(user.id);
-      author.posts.push(newPost);
-      await author.save();
+      try {
+        const newPost = await post.save();
+        const author = await User.findById(user.id);
+        author.posts.push(newPost);
+        await author.save();
 
-      if (mentionedUsers.length) {
-        // bulk write to users notifications
-        const newNotification = {
-          link: `/tweet/${post.id}`,
-          verb: "tagged", // liked, commented, tagged
-          message: `${user.name} mentioned you in their tweet!`,
-          username: user.username,
-          name: user.name,
-          createdAt: new Date().toISOString(),
+        if (mentionedUsers && mentionedUsers.length) {
+          // bulk write to users notifications
+          const newNotification = {
+            link: `/tweet/${post.id}`,
+            verb: "tagged", // liked, commented, tagged
+            message: `${user.name} mentioned you in their tweet!`,
+            username: user.username,
+            name: user.name,
+            createdAt: new Date().toISOString(),
+          };
+          const bulkOperations = [];
+          mentionedUsers.forEach((mentionedUser) => {
+            if (mentionedUser !== user.username) {
+              bulkOperations.push({
+                updateOne: {
+                  filter: { username: mentionedUser },
+                  update: { $push: { notifications: newNotification } },
+                  upsert: true,
+                },
+              });
+            }
+          });
+          User.bulkWrite(bulkOperations);
+        }
+
+        return {
+          ...newPost._doc,
+          id: newPost._id,
+          author: getUser.bind(this, newPost.author),
         };
-        const bulkOperations = [];
-        mentionedUsers.forEach((mentionedUser) => {
-          if (mentionedUser !== user.username) {
-            bulkOperations.push({
-              updateOne: {
-                filter: { username: mentionedUser },
-                update: { $push: { notifications: newNotification } },
-                upsert: true,
-              },
-            });
-          }
-        });
-        User.bulkWrite(bulkOperations);
+      } catch (err) {
+        console.log(err);
+        return err;
       }
-
-      return {
-        ...newPost._doc,
-        id: newPost._id,
-        author: getUser.bind(this, newPost.author),
-      };
     },
     deletePost: async (_, { postId }, context) => {
       const { user } = checkAuth(context);
