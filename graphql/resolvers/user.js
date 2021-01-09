@@ -74,8 +74,6 @@ module.exports = {
         return err;
       }
     },
-  },
-  Mutation: {
     login: async (_, args) => {
       const { username, password } = args;
       const { valid, errors } = validateLoginInput(username, password);
@@ -105,8 +103,6 @@ module.exports = {
         const token = generateToken({
           id: user._id,
           username: user.username,
-          name: user.name,
-          profile_pic: user.profile_pic,
         });
 
         const unreadNotifications = user.notifications
@@ -126,6 +122,8 @@ module.exports = {
         return err;
       }
     },
+  },
+  Mutation: {
     register: async (_, args) => {
       const {
         registerInput: { name, email, password, bio },
@@ -160,8 +158,8 @@ module.exports = {
         const token = generateToken({
           id: savedUser._id,
           username: savedUser.username,
-          name: savedUser.name, // see if we need this in frontend?
         });
+
         return {
           ...savedUser._doc,
           id: savedUser._id,

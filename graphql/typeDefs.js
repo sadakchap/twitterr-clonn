@@ -94,12 +94,12 @@ const typeDefs = gql`
     getPost(postId: ID!): Post!
     getUsers(filter: String): [User!]!
     getUser(username: String!): User!
+    login(username: String!, password: String!): AuthData!
 
     getMessages(from: String!): [Message!]!
     getNotifications: [Notification!]!
   }
   type Mutation {
-    login(username: String!, password: String!): AuthData!
     register(registerInput: RegisterInput): AuthData!
     createPost(body: String!, mentionedUsers: [String!]): Post!
     deletePost(postId: ID!): String!
