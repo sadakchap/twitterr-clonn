@@ -110,10 +110,8 @@ module.exports = {
           : 0;
 
         return {
+          ...user._doc,
           id: user._id,
-          username: user.username,
-          name: user.name,
-          profile_pic: user.profile_pic,
           token,
           tokenExpiration: 1,
           unreadNotifications,

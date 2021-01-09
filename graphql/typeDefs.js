@@ -54,6 +54,8 @@ const typeDefs = gql`
     username: String!
     name: String!
     email: String!
+    token: String
+    tokenExpiration: Int
     posts: [Post!]!
     createdAt: String!
     postsCount: Int!
@@ -66,15 +68,6 @@ const typeDefs = gql`
     location: String
     dob: String
     lastMessage: Message
-  }
-  type AuthData {
-    id: ID!
-    name: String!
-    username: String!
-    profile_pic: String
-    token: String!
-    tokenExpiration: Int!
-    unreadNotifications: Int!
   }
   input RegisterInput {
     name: String!
@@ -94,13 +87,13 @@ const typeDefs = gql`
     getPost(postId: ID!): Post!
     getUsers(filter: String): [User!]!
     getUser(username: String!): User!
-    login(username: String!, password: String!): AuthData!
+    login(username: String!, password: String!): User!
 
     getMessages(from: String!): [Message!]!
     getNotifications: [Notification!]!
   }
   type Mutation {
-    register(registerInput: RegisterInput): AuthData!
+    register(registerInput: RegisterInput): User!
     createPost(body: String!, mentionedUsers: [String!]): Post!
     deletePost(postId: ID!): String!
     updatePost(postId: ID!, body: String!): Post!
