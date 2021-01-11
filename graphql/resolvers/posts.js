@@ -48,6 +48,7 @@ module.exports = {
         await author.save();
 
         if (mentionedUsers && mentionedUsers.length) {
+          console.log("comming here");
           // bulk write to users notifications
           const newNotification = {
             link: `/tweet/${post.id}`,

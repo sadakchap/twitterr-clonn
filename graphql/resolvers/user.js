@@ -103,6 +103,7 @@ module.exports = {
         const token = generateToken({
           id: user._id,
           username: user.username,
+          name: user.name,
         });
 
         const unreadNotifications = user.notifications
@@ -156,6 +157,7 @@ module.exports = {
         const token = generateToken({
           id: savedUser._id,
           username: savedUser.username,
+          name: savedUser.name,
         });
 
         return {
