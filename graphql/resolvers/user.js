@@ -62,6 +62,11 @@ module.exports = {
         const unreadNotifications = user.notifications
           ? user.notifications.filter((not) => not.read === false).length
           : 0;
+
+        user.notifications = user.notifications.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
         return {
           ...user._doc,
           id: user._id,
